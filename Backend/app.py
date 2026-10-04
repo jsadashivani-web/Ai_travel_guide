@@ -4,12 +4,17 @@ from google import genai
 import requests
 import tempfile
 import base64
+import os
+
+
+
+
 
 app = Flask(__name__)
 CORS(app)
-MURF_API_KEY = ""
-
-client = genai.Client(api_key="")
+MURF_API_KEY = os.getenv("MURF_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 PROMPTS = {
     "Summary": """
@@ -89,7 +94,7 @@ def generate_description(place, answer_type, language):
         model="gemini-3.1-flash-lite",
         contents=prompt
     )
-    return response.text 
+    return response.text
     
 @app.route("/generate-audio-guide", methods=["POST"])
 def generate_audio_guide():
@@ -111,4 +116,8 @@ def generate_audio_guide():
         "audioBase64": encoded_audio
                 }
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000))
+    )
